@@ -9,6 +9,86 @@
             "location": "/#home",
             "text": "This is the documentation home for Rojo.  Rojo  is a flexible multi-tool designed for creating robust Roblox projects.  This documentation is a work in progress, and is incomplete.",
             "title": "Home"
+        },
+        {
+            "location": "/why-rojo/",
+            "text": "Why Rojo?\n\u00b6\n\n\nThere are a number of existing plugins for Roblox that move code from the filesystem into Roblox.\n\n\nBesides Rojo, there is:\n\n\n\n\nStudio Bridge\n by \nVocksel\n\n\nRbxRefresh\n by \nOsyris\n\n\nRbxSync\n by \nevaera\n\n\nCodeSync\n and \nrbx-exteditor\n by \nMemoryPenguin\n\n\nrbxmk\n by \nAnaminus\n\n\n\n\nSo why did I build Rojo?\n\n\nEach of these tools solves what is essentially the same problem from a few different angles. The goal of Rojo is to take all of the lessons and ideas learned from these projects and build a tool that can solve the problem for good.\n\n\nAdditionally:\n\n\n\n\nI think that this tool needs to be built in a compiled language without a runtime, for easy distribution and good performance.\n\n\nI think that the conventions promoted by other sync plugins (\n.module.lua\n for modules, as well a single sync point) are sub-optimal.\n\n\nI think that I have a good enough understanding of the problem to build something robust.\n\n\nI think that Rojo should be able to do more than just sync code.",
+            "title": "Why Rojo?"
+        },
+        {
+            "location": "/why-rojo/#why-rojo",
+            "text": "There are a number of existing plugins for Roblox that move code from the filesystem into Roblox.  Besides Rojo, there is:   Studio Bridge  by  Vocksel  RbxRefresh  by  Osyris  RbxSync  by  evaera  CodeSync  and  rbx-exteditor  by  MemoryPenguin  rbxmk  by  Anaminus   So why did I build Rojo?  Each of these tools solves what is essentially the same problem from a few different angles. The goal of Rojo is to take all of the lessons and ideas learned from these projects and build a tool that can solve the problem for good.  Additionally:   I think that this tool needs to be built in a compiled language without a runtime, for easy distribution and good performance.  I think that the conventions promoted by other sync plugins ( .module.lua  for modules, as well a single sync point) are sub-optimal.  I think that I have a good enough understanding of the problem to build something robust.  I think that Rojo should be able to do more than just sync code.",
+            "title": "Why Rojo?"
+        },
+        {
+            "location": "/getting-started/installation/",
+            "text": "Installation\n\u00b6\n\n\nRojo has two components:\n\n\n\n\nThe server, a binary written in Rust\n\n\nThe plugin, a Roblox Studio plugin written in Lua\n\n\n\n\nIt's important that the plugin and server are compatible. The plugin will show errors in the Roblox Studio Output window if there is a version mismatch.\n\n\nInstalling the Server\n\u00b6\n\n\nTo install the server, either:\n\n\n\n\nIf you have Rust installed, use \ncargo install rojo\n\n\nOr, download a pre-built Windows binary from \nthe GitHub releases page\n\n\n\n\nThe Rojo binary must be run from the command line, like Terminal on MacOS or \ncmd.exe\n on Windows. It's recommended that you put the Rojo binary on your \nPATH\n to make this easier.\n\n\nInstalling the Plugin\n\u00b6\n\n\nTo install the plugin, either:\n\n\n\n\nInstall the plugin from the \nRoblox plugin page\n.\n\n\nThis gives you less control over what version you install -- you will always have the latest version.\n\n\nOr, download the latest release from \nthe GitHub releases section\n and install it into your Roblox plugins folder\n\n\nYou can open this folder by clicking the \"Plugins Folder\" button from the Plugins toolbar in Roblox Studio",
+            "title": "Installation"
+        },
+        {
+            "location": "/getting-started/installation/#installation",
+            "text": "Rojo has two components:   The server, a binary written in Rust  The plugin, a Roblox Studio plugin written in Lua   It's important that the plugin and server are compatible. The plugin will show errors in the Roblox Studio Output window if there is a version mismatch.",
+            "title": "Installation"
+        },
+        {
+            "location": "/getting-started/installation/#installing-the-server",
+            "text": "To install the server, either:   If you have Rust installed, use  cargo install rojo  Or, download a pre-built Windows binary from  the GitHub releases page   The Rojo binary must be run from the command line, like Terminal on MacOS or  cmd.exe  on Windows. It's recommended that you put the Rojo binary on your  PATH  to make this easier.",
+            "title": "Installing the Server"
+        },
+        {
+            "location": "/getting-started/installation/#installing-the-plugin",
+            "text": "To install the plugin, either:   Install the plugin from the  Roblox plugin page .  This gives you less control over what version you install -- you will always have the latest version.  Or, download the latest release from  the GitHub releases section  and install it into your Roblox plugins folder  You can open this folder by clicking the \"Plugins Folder\" button from the Plugins toolbar in Roblox Studio",
+            "title": "Installing the Plugin"
+        },
+        {
+            "location": "/getting-started/creating-a-project/",
+            "text": "Creating a Project\n\u00b6\n\n\nTo use Rojo, you'll need to create a new project file, which tells Rojo what your project is, and how to load it into Roblox Studio.\n\n\nNew Project\n\u00b6\n\n\nCreate a new folder, then run \nrojo init\n inside that folder to initialize an empty project.\n\n\nmkdir my-new-project\n\ncd\n my-new-project\n\nrojo init\n\n\n\n\n\nRojo will create an empty project file named \nrojo.json\n in the directory.\n\n\nThe default configuration doesn't do anything. We need to tell Rojo where our code is on the filesystem, and where we want to put it in the Roblox tree.\n\n\nTo do that, open up \nrojo.json\n and add an entry to the \npartitions\n table:\n\n\n{\n\n    \n\"name\"\n:\n \n\"your-project-name-here\"\n,\n\n    \n\"servePort\"\n:\n \n8000\n,\n\n    \n\"partitions\"\n:\n \n{\n\n        \n\"src\"\n:\n \n{\n\n            \n\"path\"\n:\n \n\"src\"\n,\n\n            \n\"target\"\n:\n \n\"ReplicatedStorage.Project\"\n\n        \n}\n\n    \n}\n\n\n}\n\n\n\n\n\n\n\n\nWarning\n\n\nMake sure that the \nsrc\n directory exists in your project, or Rojo will throw an error!\n\n\n\n\n\n\nWarning\n\n\nAny objects contained in the \ntarget\n of a partition will be destroyed by Rojo if not found on the filesystem!\n\n\n\n\nA Rojo project has one or more \npartitions\n. Partitions define how code should be transferred between the filesystem and Roblox by mapping directories and files to Roblox objects.\n\n\nEach partition has:\n\n\n\n\nA name (the key in the \npartitions\n object), which is used for debugging\n\n\npath\n, the location on the filesystem relative to \nrojo.json\n\n\ntarget\n, the location in Roblox relative to \ngame\n\n\n\n\nSyncing into Studio\n\u00b6\n\n\nOnce you've added your partition to the project file, you can start the Rojo dev server by running a command in your project's directory:\n\n\nrojo serve\n\n\n\n\n\nIf your project is in the right place, Rojo will let you know that it was found and start an HTTP server that the plugin can connect to.\n\n\nIn Roblox Studio, open the plugins tab and find Rojo's buttons.\n\n\n\n\nPress \nTest Connection\n to verify that the plugin can communicate with the dev server. Watch the Output panel for the results.\n\n\n\n\nInfo\n\n\nIf you see an error message, return to the previous steps and make sure that the Rojo dev server is running.\n\n\n\n\n\n\nAfter your connection was successful, press \nSync In\n to move code from the filesystem into Studio, or use \nToggle Polling\n to have Rojo automatically sync in changes as they happen.\n\n\nImporting an Existing Project\n\u00b6\n\n\nRojo will eventually support importing an existing Roblox project onto the filesystem for use with Rojo.\n\n\nRojo doesn't currently support converting an existing project or syncing files from Roblox Studio onto the filesystem. In the mean time, you can manually copy your files into the structure that Rojo expects.\n\n\nUp-to-date information will be available on \nissue #5\n as this is worked on.",
+            "title": "Creating a Project"
+        },
+        {
+            "location": "/getting-started/creating-a-project/#creating-a-project",
+            "text": "To use Rojo, you'll need to create a new project file, which tells Rojo what your project is, and how to load it into Roblox Studio.",
+            "title": "Creating a Project"
+        },
+        {
+            "location": "/getting-started/creating-a-project/#new-project",
+            "text": "Create a new folder, then run  rojo init  inside that folder to initialize an empty project.  mkdir my-new-project cd  my-new-project\n\nrojo init  Rojo will create an empty project file named  rojo.json  in the directory.  The default configuration doesn't do anything. We need to tell Rojo where our code is on the filesystem, and where we want to put it in the Roblox tree.  To do that, open up  rojo.json  and add an entry to the  partitions  table:  { \n     \"name\" :   \"your-project-name-here\" , \n     \"servePort\" :   8000 , \n     \"partitions\" :   { \n         \"src\" :   { \n             \"path\" :   \"src\" , \n             \"target\" :   \"ReplicatedStorage.Project\" \n         } \n     }  }    Warning  Make sure that the  src  directory exists in your project, or Rojo will throw an error!    Warning  Any objects contained in the  target  of a partition will be destroyed by Rojo if not found on the filesystem!   A Rojo project has one or more  partitions . Partitions define how code should be transferred between the filesystem and Roblox by mapping directories and files to Roblox objects.  Each partition has:   A name (the key in the  partitions  object), which is used for debugging  path , the location on the filesystem relative to  rojo.json  target , the location in Roblox relative to  game",
+            "title": "New Project"
+        },
+        {
+            "location": "/getting-started/creating-a-project/#syncing-into-studio",
+            "text": "Once you've added your partition to the project file, you can start the Rojo dev server by running a command in your project's directory:  rojo serve  If your project is in the right place, Rojo will let you know that it was found and start an HTTP server that the plugin can connect to.  In Roblox Studio, open the plugins tab and find Rojo's buttons.   Press  Test Connection  to verify that the plugin can communicate with the dev server. Watch the Output panel for the results.   Info  If you see an error message, return to the previous steps and make sure that the Rojo dev server is running.    After your connection was successful, press  Sync In  to move code from the filesystem into Studio, or use  Toggle Polling  to have Rojo automatically sync in changes as they happen.",
+            "title": "Syncing into Studio"
+        },
+        {
+            "location": "/getting-started/creating-a-project/#importing-an-existing-project",
+            "text": "Rojo will eventually support importing an existing Roblox project onto the filesystem for use with Rojo.  Rojo doesn't currently support converting an existing project or syncing files from Roblox Studio onto the filesystem. In the mean time, you can manually copy your files into the structure that Rojo expects.  Up-to-date information will be available on  issue #5  as this is worked on.",
+            "title": "Importing an Existing Project"
+        },
+        {
+            "location": "/sync-details/",
+            "text": "Sync Details\n\u00b6\n\n\nThis page aims to describe how Rojo turns files on the filesystem into Roblox objects.\n\n\nFolders\n\u00b6\n\n\nAny directory on the filesystem will turn into a \nFolder\n instance in Roblox, unless that folder matches the name of a service or other existing instance. In those cases, that instance will be preserved.\n\n\nScripts\n\u00b6\n\n\nRojo can represent \nModuleScript\n, \nScript\n, and \nLocalScript\n objects. The default script type is \nModuleScript\n, since most scripts in well-structued Roblox projects will be modules.\n\n\n\n\n\n\n\n\nFile Name\n\n\nInstance Type\n\n\n\n\n\n\n\n\n\n\n*.server.lua\n\n\nScript\n\n\n\n\n\n\n*.client.lua\n\n\nLocalScript\n\n\n\n\n\n\n*.lua\n\n\nModuleScript\n\n\n\n\n\n\n\n\nIf a directory contains a file named \ninit.server.lua\n, \ninit.client.lua\n, or \ninit.lua\n, that folder will be transformed into a \n*Script\n instance with the conents of the \ninit\n file. This can be used to create scripts inside of scripts.\n\n\nFor example, this file tree:\n\n\n\n\nmy-game\n\n\ninit.client.lua\n\n\nfoo.lua\n\n\n\n\n\n\n\n\nWill turn into these instances in Roblox:\n\n\n\n\nModels\n\u00b6\n\n\nRojo supports a JSON model format for representing simple models. It's designed for instance types like \nBindableEvent\n or \n*Value\n objects, and is not suitable for larger models.\n\n\n\n\nInfo\n\n\nIn the future, Rojo will support \n.rbxmx\n models. See \nissue #7\n for more details and updates on this feature.\n\n\n\n\nJSON model files are strict, with every property being required. They look like this:\n\n\n{\n\n    \n\"Name\"\n:\n \n\"hello\"\n,\n\n    \n\"ClassName\"\n:\n \n\"Model\"\n,\n\n    \n\"Children\"\n:\n \n[\n\n        \n{\n\n            \n\"Name\"\n:\n \n\"Some Part\"\n,\n\n            \n\"ClassName\"\n:\n \n\"Part\"\n,\n\n            \n\"Children\"\n:\n \n[],\n\n            \n\"Properties\"\n:\n \n{}\n\n        \n},\n\n        \n{\n\n            \n\"Name\"\n:\n \n\"Some StringValue\"\n,\n\n            \n\"ClassName\"\n:\n \n\"StringValue\"\n,\n\n            \n\"Children\"\n:\n \n[],\n\n            \n\"Properties\"\n:\n \n{\n\n                \n\"Value\"\n:\n \n{\n\n                    \n\"Type\"\n:\n \n\"String\"\n,\n\n                    \n\"Value\"\n:\n \n\"Hello, world!\"\n\n                \n}\n\n            \n}\n\n        \n}\n\n    \n],\n\n    \n\"Properties\"\n:\n \n{}\n\n\n}",
+            "title": "Sync Details"
+        },
+        {
+            "location": "/sync-details/#sync-details",
+            "text": "This page aims to describe how Rojo turns files on the filesystem into Roblox objects.",
+            "title": "Sync Details"
+        },
+        {
+            "location": "/sync-details/#folders",
+            "text": "Any directory on the filesystem will turn into a  Folder  instance in Roblox, unless that folder matches the name of a service or other existing instance. In those cases, that instance will be preserved.",
+            "title": "Folders"
+        },
+        {
+            "location": "/sync-details/#scripts",
+            "text": "Rojo can represent  ModuleScript ,  Script , and  LocalScript  objects. The default script type is  ModuleScript , since most scripts in well-structued Roblox projects will be modules.     File Name  Instance Type      *.server.lua  Script    *.client.lua  LocalScript    *.lua  ModuleScript     If a directory contains a file named  init.server.lua ,  init.client.lua , or  init.lua , that folder will be transformed into a  *Script  instance with the conents of the  init  file. This can be used to create scripts inside of scripts.  For example, this file tree:   my-game  init.client.lua  foo.lua     Will turn into these instances in Roblox:",
+            "title": "Scripts"
+        },
+        {
+            "location": "/sync-details/#models",
+            "text": "Rojo supports a JSON model format for representing simple models. It's designed for instance types like  BindableEvent  or  *Value  objects, and is not suitable for larger models.   Info  In the future, Rojo will support  .rbxmx  models. See  issue #7  for more details and updates on this feature.   JSON model files are strict, with every property being required. They look like this:  { \n     \"Name\" :   \"hello\" , \n     \"ClassName\" :   \"Model\" , \n     \"Children\" :   [ \n         { \n             \"Name\" :   \"Some Part\" , \n             \"ClassName\" :   \"Part\" , \n             \"Children\" :   [], \n             \"Properties\" :   {} \n         }, \n         { \n             \"Name\" :   \"Some StringValue\" , \n             \"ClassName\" :   \"StringValue\" , \n             \"Children\" :   [], \n             \"Properties\" :   { \n                 \"Value\" :   { \n                     \"Type\" :   \"String\" , \n                     \"Value\" :   \"Hello, world!\" \n                 } \n             } \n         } \n     ], \n     \"Properties\" :   {}  }",
+            "title": "Models"
         }
     ]
 }

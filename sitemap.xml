@@ -4,7 +4,39 @@
     
     <url>
      <loc>https://lpghatguy.github.io/rojo//</loc>
-     <lastmod>2018-04-01</lastmod>
+     <lastmod>2018-04-08</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>https://lpghatguy.github.io/rojo//why-rojo/</loc>
+     <lastmod>2018-04-08</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+        
+    <url>
+     <loc>https://lpghatguy.github.io/rojo//getting-started/installation/</loc>
+     <lastmod>2018-04-08</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>https://lpghatguy.github.io/rojo//getting-started/creating-a-project/</loc>
+     <lastmod>2018-04-08</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+    <url>
+     <loc>https://lpghatguy.github.io/rojo//sync-details/</loc>
+     <lastmod>2018-04-08</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
