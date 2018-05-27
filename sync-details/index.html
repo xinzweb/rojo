@@ -468,26 +468,25 @@
 <p>Will turn into these instances in Roblox:</p>
 <p><img alt="Example of Roblox instances" src="../images/sync-example.png" /></p>
 <h2 id="models">Models<a class="headerlink" href="#models" title="Permanent link">&para;</a></h2>
-<p>Rojo supports a JSON model format for representing simple models. It's designed for instance types like <code>BindableEvent</code> or <code>*Value</code> objects, and is not suitable for larger models.</p>
+<p>Rojo supports a JSON model format for representing simple models. It's designed for instance types like <code>BindableEvent</code> or <code>Value</code> objects, and is not suitable for larger models.</p>
+<p>Rojo JSON models are stored in <code>.model.json</code> files.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>In the future, Rojo will support <code>.rbxmx</code> models. See <a href="https://github.com/LPGhatguy/rojo/issues/7">issue #7</a> for more details and updates on this feature.</p>
 </div>
-<p>JSON model files are strict, with every property being required. They look like this:</p>
+<p>JSON model files are fairly strict; any syntax errors will cause the model to fail to sync! They look like this:</p>
+<p><code>hello.model.json</code></p>
 <div class="codehilite"><pre><span></span><span class="p">{</span>
     <span class="nt">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;hello&quot;</span><span class="p">,</span>
     <span class="nt">&quot;ClassName&quot;</span><span class="p">:</span> <span class="s2">&quot;Model&quot;</span><span class="p">,</span>
     <span class="nt">&quot;Children&quot;</span><span class="p">:</span> <span class="p">[</span>
         <span class="p">{</span>
             <span class="nt">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Some Part&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;ClassName&quot;</span><span class="p">:</span> <span class="s2">&quot;Part&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;Children&quot;</span><span class="p">:</span> <span class="p">[],</span>
-            <span class="nt">&quot;Properties&quot;</span><span class="p">:</span> <span class="p">{}</span>
+            <span class="nt">&quot;ClassName&quot;</span><span class="p">:</span> <span class="s2">&quot;Part&quot;</span>
         <span class="p">},</span>
         <span class="p">{</span>
             <span class="nt">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Some StringValue&quot;</span><span class="p">,</span>
             <span class="nt">&quot;ClassName&quot;</span><span class="p">:</span> <span class="s2">&quot;StringValue&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;Children&quot;</span><span class="p">:</span> <span class="p">[],</span>
             <span class="nt">&quot;Properties&quot;</span><span class="p">:</span> <span class="p">{</span>
                 <span class="nt">&quot;Value&quot;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="nt">&quot;Type&quot;</span><span class="p">:</span> <span class="s2">&quot;String&quot;</span><span class="p">,</span>
@@ -495,8 +494,7 @@
                 <span class="p">}</span>
             <span class="p">}</span>
         <span class="p">}</span>
-    <span class="p">],</span>
-    <span class="nt">&quot;Properties&quot;</span><span class="p">:</span> <span class="p">{}</span>
+    <span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
                 
