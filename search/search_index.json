@@ -22,7 +22,7 @@
         },
         {
             "location": "/getting-started/installation/",
-            "text": "Installation\n\u00b6\n\n\nRojo has two components:\n\n\n\n\nThe server, a binary written in Rust\n\n\nThe plugin, a Roblox Studio plugin written in Lua\n\n\n\n\nIt's important that the plugin and server are compatible. The plugin will show errors in the Roblox Studio Output window if there is a version mismatch.\n\n\nInstalling the Server\n\u00b6\n\n\nTo install the server, either:\n\n\n\n\nIf you have Rust installed, use \ncargo install rojo\n\n\nOr, download a pre-built Windows binary from \nthe GitHub releases page\n\n\n\n\nThe Rojo binary must be run from the command line, like Terminal on MacOS or \ncmd.exe\n on Windows. It's recommended that you put the Rojo binary on your \nPATH\n to make this easier.\n\n\nInstalling the Plugin\n\u00b6\n\n\nTo install the plugin, either:\n\n\n\n\nInstall the plugin from the \nRoblox plugin page\n.\n\n\nThis gives you less control over what version you install -- you will always have the latest version.\n\n\nOr, download the latest release from \nthe GitHub releases section\n and install it into your Roblox plugins folder\n\n\nYou can open this folder by clicking the \"Plugins Folder\" button from the Plugins toolbar in Roblox Studio",
+            "text": "Installation\n\u00b6\n\n\nRojo has two components:\n\n\n\n\nThe server, a binary written in Rust\n\n\nThe plugin, a Roblox Studio plugin written in Lua\n\n\n\n\nIt's important that the plugin and server are compatible. The plugin will show errors in the Roblox Studio Output window if there is a version mismatch.\n\n\nInstalling the Server\n\u00b6\n\n\nTo install the server, either:\n\n\n\n\nIf you have Rust installed, use \ncargo install rojo\n\n\nOr, download a pre-built Windows binary from \nthe GitHub releases page\n\n\n\n\nThe Rojo binary must be run from the command line, like Terminal on MacOS or \ncmd.exe\n on Windows. It's recommended that you put the Rojo binary on your \nPATH\n to make this easier.\n\n\nInstalling the Plugin\n\u00b6\n\n\nTo install the plugin, either:\n\n\n\n\nInstall the plugin from the \nRoblox plugin page\n.\n\n\nThis gives you less control over what version you install -- you will always have the latest version.\n\n\nOr, download the latest release from \nthe GitHub releases section\n and install it into your Roblox plugins folder\n\n\nYou can open this folder by clicking the \"Plugins Folder\" button from the Plugins toolbar in Roblox Studio\n\n\n\n\nVisual Studio Code Extension\n\u00b6\n\n\nIf you use Visual Studio Code on Windows, you can install \nEvaera's unofficial Rojo extension\n, which will install both halves of Rojo for you. It even has a nifty UI to add partitions and start/stop the Rojo server!",
             "title": "Installation"
         },
         {
@@ -39,6 +39,11 @@
             "location": "/getting-started/installation/#installing-the-plugin",
             "text": "To install the plugin, either:   Install the plugin from the  Roblox plugin page .  This gives you less control over what version you install -- you will always have the latest version.  Or, download the latest release from  the GitHub releases section  and install it into your Roblox plugins folder  You can open this folder by clicking the \"Plugins Folder\" button from the Plugins toolbar in Roblox Studio",
             "title": "Installing the Plugin"
+        },
+        {
+            "location": "/getting-started/installation/#visual-studio-code-extension",
+            "text": "If you use Visual Studio Code on Windows, you can install  Evaera's unofficial Rojo extension , which will install both halves of Rojo for you. It even has a nifty UI to add partitions and start/stop the Rojo server!",
+            "title": "Visual Studio Code Extension"
         },
         {
             "location": "/getting-started/creating-a-project/",
