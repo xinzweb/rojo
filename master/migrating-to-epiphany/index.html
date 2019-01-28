@@ -11,8 +11,6 @@
       <meta http-equiv="x-ua-compatible" content="ie=edge">
       
       
-        <link rel="canonical" href="https://lpghatguy.github.io/rojo/migrating-to-epiphany/">
-      
       
       
         <meta name="lang:clipboard.copy" content="Copy to clipboard">
@@ -65,6 +63,8 @@
     <link rel="stylesheet" href="../assets/fonts/material-icons.css">
     
     
+      <link rel="stylesheet" href="../extra.css">
+    
     
   </head>
   
@@ -110,7 +110,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="https://lpghatguy.github.io/rojo/" title="Rojo Documentation" class="md-header-nav__button md-logo">
+        <a href=".." title="Rojo Documentation" class="md-header-nav__button md-logo">
           
             <i class="md-icon"></i>
           
@@ -206,7 +206,7 @@
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="https://lpghatguy.github.io/rojo/" title="Rojo Documentation" class="md-nav__button md-logo">
+    <a href=".." title="Rojo Documentation" class="md-nav__button md-logo">
       
         <i class="md-icon"></i>
       
@@ -365,13 +365,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#migrating-modeljson-files" title="Migrating .model.json Files" class="md-nav__link">
-    Migrating .model.json Files
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#migrating-unknown-files" title="Migrating Unknown Files" class="md-nav__link">
     Migrating Unknown Files
   </a>
@@ -417,13 +410,6 @@
         <li class="md-nav__item">
   <a href="#upgrading-your-project-file" title="Upgrading Your Project File" class="md-nav__link">
     Upgrading Your Project File
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#migrating-modeljson-files" title="Migrating .model.json Files" class="md-nav__link">
-    Migrating .model.json Files
   </a>
   
 </li>
@@ -498,8 +484,6 @@
 <p>For each object in the tree, we define <em>metadata</em> and <em>children</em>.</p>
 <p>Metadata begins with a dollar sign (<code>$</code>), like <code>$className</code>. This is so that children and metadata can coexist without creating too many nested layers.</p>
 <p>All other values are considered children, where the key is the instance's name, and the value is an object, repeating the process.</p>
-<h2 id="migrating-modeljson-files">Migrating <code>.model.json</code> Files<a class="headerlink" href="#migrating-modeljson-files" title="Permanent link">&para;</a></h2>
-<p>No upgrade path yet, stay tuned.</p>
 <h2 id="migrating-unknown-files">Migrating Unknown Files<a class="headerlink" href="#migrating-unknown-files" title="Permanent link">&para;</a></h2>
 <p>If you used Rojo to sync in files as <code>StringValue</code> objects, you'll need to make sure those files end with the <code>txt</code> extension to preserve this in Rojo 0.5.x.</p>
 <p>Unknown files are now ignored in Rojo instead of being converted to <code>StringValue</code> objects.</p>
