@@ -101,7 +101,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#building-your-place" tabindex="1" class="md-skip">
+      <a href="#creating-the-rojo-project" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -324,6 +324,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#creating-the-rojo-project" title="Creating the Rojo Project" class="md-nav__link">
+    Creating the Rojo Project
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#building-your-place" title="Building Your Place" class="md-nav__link">
     Building Your Place
   </a>
@@ -384,6 +391,42 @@
   </li>
 
     
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
+    
+    <label class="md-nav__link" for="nav-6">
+      Rojo Internals
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-6">
+        Rojo Internals
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../internals/overview/" title="Internals Overview" class="md-nav__link">
+      Internals Overview
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
   </ul>
 </nav>
                   </div>
@@ -401,6 +444,13 @@
   
     <label class="md-nav__title" for="__toc">Table of contents</label>
     <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#creating-the-rojo-project" title="Creating the Rojo Project" class="md-nav__link">
+    Creating the Rojo Project
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#building-your-place" title="Building Your Place" class="md-nav__link">
@@ -444,7 +494,16 @@
                 
                   <h1>Creating a Place with Rojo</h1>
                 
-                <p>To use Rojo to build a place, you'll need to create a new project file, which tells Rojo how your project is structured on-disk and in Roblox.</p>
+                <div class="toc">
+<ul>
+<li><a href="#creating-the-rojo-project">Creating the Rojo Project</a></li>
+<li><a href="#building-your-place">Building Your Place</a></li>
+<li><a href="#live-syncing-into-studio">Live-Syncing into Studio</a></li>
+<li><a href="#uploading-your-place">Uploading Your Place</a></li>
+</ul>
+</div>
+<h2 id="creating-the-rojo-project">Creating the Rojo Project<a class="headerlink" href="#creating-the-rojo-project" title="Permanent link">&para;</a></h2>
+<p>To use Rojo to build a place, you'll need to create a new project file, which tells Rojo how your project is structured on-disk and in Roblox.</p>
 <p>Create a new folder, then run <code>rojo init</code> inside that folder to initialize an empty project.</p>
 <div class="codehilite"><pre><span></span>mkdir my-new-project
 <span class="nb">cd</span> my-new-project
