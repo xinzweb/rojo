@@ -508,14 +508,14 @@ rojo init
 <h2 id="building-your-place">Building Your Place<a class="headerlink" href="#building-your-place" title="Permanent link">&para;</a></h2>
 <p>Now that we have a project, one thing we can do is build a Roblox place file for our project. This is a great way to get started with a project quickly with no fuss.</p>
 <p>All we have to do is call <code>rojo build</code>:</p>
-<div class="codehilite"><pre><span></span>rojo build -o MyNewProject.rbxl
+<div class="codehilite"><pre><span></span>rojo build -o MyNewProject.rbxlx
 </pre></div>
 
 
-<p>If you open <code>MyNewProject.rbxl</code> in Roblox Studio now, you should see a <code>Folder</code> containing a <code>ModuleScript</code> under <code>ReplicatedStorage</code>!</p>
+<p>If you open <code>MyNewProject.rbxlx</code> in Roblox Studio now, you should see a <code>Folder</code> containing a <code>ModuleScript</code> under <code>ReplicatedStorage</code>!</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
-<p>To generate an XML place file instead, like if you're checking the place file into version control, just use <code>rbxlx</code> as the extension on the output file instead.</p>
+<p>To generate a binary place file instead, use <code>rbxl</code>. Note that support for binary model/place files (<code>rbxm</code> and <code>rbxl</code>) is very limited in Rojo presently.</p>
 </div>
 <h2 id="live-syncing-into-studio">Live-Syncing into Studio<a class="headerlink" href="#live-syncing-into-studio" title="Permanent link">&para;</a></h2>
 <p>Building a place file is great for the initial build, but for actively working on your place, you'll want something quicker.</p>
