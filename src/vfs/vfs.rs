@@ -63,84 +63,11 @@ impl<F: VfsFetcher> Vfs<F> {
     }
 
     pub fn get_contents(&self, path: impl AsRef<Path>) -> FsResult<Arc<Vec<u8>>> {
-        let path = path.as_ref();
-
-        let mut data = self.inner.data.lock().unwrap();
-        VfsInner::read_if_not_exists(&mut data, &self.inner.fetcher, path)?;
-
-        match data.get_mut(path).unwrap() {
-            VfsItem::File(file) => {
-                if file.contents.is_none() {
-                    file.contents = Some(
-                        self.inner
-                            .fetcher
-                            .read_contents(path)
-                            .map(Arc::new)
-                            .map_err(|err| FsError::new(err, path.to_path_buf()))?,
-                    );
-                }
-
-                Ok(file.contents.clone().unwrap())
-            }
-            VfsItem::Directory(_) => Err(FsError::new(
-                io::Error::new(io::ErrorKind::Other, "Can't read a directory"),
-                path.to_path_buf(),
-            )),
-        }
+        self.inner.get_contents(path)
     }
 
     pub fn get_children(&self, path: impl AsRef<Path>) -> FsResult<Vec<VfsEntry<F>>> {
-        let path = path.as_ref();
-
-        let mut data = self.inner.data.lock().unwrap();
-        VfsInner::read_if_not_exists(&mut data, &self.inner.fetcher, path)?;
-
-        match data.get_mut(path).unwrap() {
-            VfsItem::Directory(dir) => {
-                self.inner.fetcher.watch(path);
-
-                let enumerated = dir.children_enumerated;
-
-                if enumerated {
-                    data.children(path)
-                        .unwrap() // TODO: Handle None here, which means the PathMap entry did not exist.
-                        .into_iter()
-                        .map(PathBuf::from) // Convert paths from &Path to PathBuf
-                        .collect::<Vec<PathBuf>>() // Collect all PathBufs, since self.get needs to borrow self mutably.
-                        .into_iter()
-                        .map(|path| {
-                            VfsInner::get_internal(
-                                Arc::clone(&self.inner),
-                                &mut data,
-                                &self.inner.fetcher,
-                                path,
-                            )
-                        })
-                        .collect::<FsResult<Vec<VfsEntry<_>>>>()
-                } else {
-                    dir.children_enumerated = true;
-
-                    self.inner
-                        .fetcher
-                        .read_children(path)
-                        .map_err(|err| FsError::new(err, path.to_path_buf()))?
-                        .into_iter()
-                        .map(|path| {
-                            VfsInner::get_internal(
-                                Arc::clone(&self.inner),
-                                &mut data,
-                                &self.inner.fetcher,
-                                path,
-                            )
-                        })
-                        .collect::<FsResult<Vec<VfsEntry<_>>>>()
-                }
-            }
-            VfsItem::File(_) => Err(FsError::new(
-                io::Error::new(io::ErrorKind::Other, "Can't read a directory"),
-                path.to_path_buf(),
-            )),
-        }
+        VfsInner::get_children(&self.inner, path)
     }
 }
 
@@ -166,6 +93,75 @@ struct VfsInner<F> {
 }
 
 impl<F: VfsFetcher> VfsInner<F> {
+    fn get_contents(&self, path: impl AsRef<Path>) -> FsResult<Arc<Vec<u8>>> {
+        let path = path.as_ref();
+
+        let mut data = self.data.lock().unwrap();
+        VfsInner::read_if_not_exists(&mut data, &self.fetcher, path)?;
+
+        match data.get_mut(path).unwrap() {
+            VfsItem::File(file) => {
+                if file.contents.is_none() {
+                    file.contents = Some(
+                        self.fetcher
+                            .read_contents(path)
+                            .map(Arc::new)
+                            .map_err(|err| FsError::new(err, path.to_path_buf()))?,
+                    );
+                }
+
+                Ok(file.contents.clone().unwrap())
+            }
+            VfsItem::Directory(_) => Err(FsError::new(
+                io::Error::new(io::ErrorKind::Other, "Can't read a directory"),
+                path.to_path_buf(),
+            )),
+        }
+    }
+
+    fn get_children(this: &Arc<Self>, path: impl AsRef<Path>) -> FsResult<Vec<VfsEntry<F>>> {
+        let path = path.as_ref();
+
+        let mut data = this.data.lock().unwrap();
+        VfsInner::read_if_not_exists(&mut data, &this.fetcher, path)?;
+
+        match data.get_mut(path).unwrap() {
+            VfsItem::Directory(dir) => {
+                this.fetcher.watch(path);
+
+                let enumerated = dir.children_enumerated;
+
+                if enumerated {
+                    data.children(path)
+                        .unwrap() // TODO: Handle None here, which means the PathMap entry did not exist.
+                        .into_iter()
+                        .map(PathBuf::from) // Convert paths from &Path to PathBuf
+                        .collect::<Vec<PathBuf>>() // Collect all PathBufs, since self.get needs to borrow self mutably.
+                        .into_iter()
+                        .map(|path| {
+                            VfsInner::get_internal(Arc::clone(this), &mut data, &this.fetcher, path)
+                        })
+                        .collect::<FsResult<Vec<VfsEntry<_>>>>()
+                } else {
+                    dir.children_enumerated = true;
+
+                    this.fetcher
+                        .read_children(path)
+                        .map_err(|err| FsError::new(err, path.to_path_buf()))?
+                        .into_iter()
+                        .map(|path| {
+                            VfsInner::get_internal(Arc::clone(this), &mut data, &this.fetcher, path)
+                        })
+                        .collect::<FsResult<Vec<VfsEntry<_>>>>()
+                }
+            }
+            VfsItem::File(_) => Err(FsError::new(
+                io::Error::new(io::ErrorKind::Other, "Can't read a directory"),
+                path.to_path_buf(),
+            )),
+        }
+    }
+
     fn get_internal(
         inner: Arc<Self>,
         data: &mut PathMap<VfsItem>,
@@ -439,12 +435,12 @@ impl<F: VfsFetcher> VfsEntry<F> {
         &self.path
     }
 
-    pub fn contents(&self, vfs: &Vfs<F>) -> FsResult<Arc<Vec<u8>>> {
-        vfs.get_contents(&self.path)
+    pub fn contents(&self, _vfs: &Vfs<F>) -> FsResult<Arc<Vec<u8>>> {
+        self.vfs.get_contents(&self.path)
     }
 
-    pub fn children(&self, vfs: &Vfs<F>) -> FsResult<Vec<VfsEntry<F>>> {
-        vfs.get_children(&self.path)
+    pub fn children(&self, _vfs: &Vfs<F>) -> FsResult<Vec<VfsEntry<F>>> {
+        VfsInner::get_children(&self.vfs, &self.path)
     }
 
     pub fn is_file(&self) -> bool {
