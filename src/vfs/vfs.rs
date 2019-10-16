@@ -15,37 +15,22 @@ use super::{
     snapshot::VfsSnapshot,
 };
 
-/// An in-memory filesystem that can be incrementally populated and updated as
-/// filesystem modification events occur.
-///
-/// All operations on the `Vfs` are lazy and do I/O as late as they can to
-/// avoid reading extraneous files or directories from the disk. This means that
-/// they all take `self` mutably, and means that it isn't possible to hold
-/// references to the internal state of the Vfs while traversing it!
-///
-/// Most operations return `VfsEntry` objects to work around this, which is
-/// effectively a index into the `Vfs`.
 pub struct Vfs<F> {
-    /// A hierarchical map from paths to items that have been read or partially
-    /// read into memory by the Vfs.
-    data: Mutex<PathMap<VfsItem>>,
-
-    /// This Vfs's fetcher, which is used for all actual interactions with the
-    /// filesystem. It's referred to by the type parameter `F` all over, and is
-    /// generic in order to make it feasible to mock.
-    fetcher: F,
+    inner: Arc<VfsInner<F>>,
 }
 
 impl<F: VfsFetcher> Vfs<F> {
     pub fn new(fetcher: F) -> Self {
         Self {
-            data: Mutex::new(PathMap::new()),
-            fetcher,
+            inner: Arc::new(VfsInner {
+                data: Mutex::new(PathMap::new()),
+                fetcher,
+            }),
         }
     }
 
     pub fn change_receiver(&self) -> Receiver<VfsEvent> {
-        self.fetcher.receiver()
+        self.inner.fetcher.receiver()
     }
 
     pub fn commit_change(&self, event: &VfsEvent) -> FsResult<()> {
@@ -53,36 +38,42 @@ impl<F: VfsFetcher> Vfs<F> {
 
         log::trace!("Committing Vfs change {:?}", event);
 
-        let mut data = self.data.lock().unwrap();
+        let mut data = self.inner.data.lock().unwrap();
 
         match event {
             Created(path) | Modified(path) => {
-                Self::raise_file_changed(&mut data, &self.fetcher, path)?;
+                VfsInner::raise_file_changed(&mut data, &self.inner.fetcher, path)?;
             }
             Removed(path) => {
-                Self::raise_file_removed(&mut data, &self.fetcher, path)?;
+                VfsInner::raise_file_removed(&mut data, &self.inner.fetcher, path)?;
             }
         }
 
         Ok(())
     }
 
-    pub fn get(&self, path: impl AsRef<Path>) -> FsResult<VfsEntry> {
-        let mut data = self.data.lock().unwrap();
-        Self::get_internal(&mut data, &self.fetcher, path)
+    pub fn get(&self, path: impl AsRef<Path>) -> FsResult<VfsEntry<F>> {
+        let mut data = self.inner.data.lock().unwrap();
+        VfsInner::get_internal(
+            Arc::clone(&self.inner),
+            &mut data,
+            &self.inner.fetcher,
+            path,
+        )
     }
 
     pub fn get_contents(&self, path: impl AsRef<Path>) -> FsResult<Arc<Vec<u8>>> {
         let path = path.as_ref();
 
-        let mut data = self.data.lock().unwrap();
-        Self::read_if_not_exists(&mut data, &self.fetcher, path)?;
+        let mut data = self.inner.data.lock().unwrap();
+        VfsInner::read_if_not_exists(&mut data, &self.inner.fetcher, path)?;
 
         match data.get_mut(path).unwrap() {
             VfsItem::File(file) => {
                 if file.contents.is_none() {
                     file.contents = Some(
-                        self.fetcher
+                        self.inner
+                            .fetcher
                             .read_contents(path)
                             .map(Arc::new)
                             .map_err(|err| FsError::new(err, path.to_path_buf()))?,
@@ -98,15 +89,15 @@ impl<F: VfsFetcher> Vfs<F> {
         }
     }
 
-    pub fn get_children(&self, path: impl AsRef<Path>) -> FsResult<Vec<VfsEntry>> {
+    pub fn get_children(&self, path: impl AsRef<Path>) -> FsResult<Vec<VfsEntry<F>>> {
         let path = path.as_ref();
 
-        let mut data = self.data.lock().unwrap();
-        Self::read_if_not_exists(&mut data, &self.fetcher, path)?;
+        let mut data = self.inner.data.lock().unwrap();
+        VfsInner::read_if_not_exists(&mut data, &self.inner.fetcher, path)?;
 
         match data.get_mut(path).unwrap() {
             VfsItem::Directory(dir) => {
-                self.fetcher.watch(path);
+                self.inner.fetcher.watch(path);
 
                 let enumerated = dir.children_enumerated;
 
@@ -117,17 +108,32 @@ impl<F: VfsFetcher> Vfs<F> {
                         .map(PathBuf::from) // Convert paths from &Path to PathBuf
                         .collect::<Vec<PathBuf>>() // Collect all PathBufs, since self.get needs to borrow self mutably.
                         .into_iter()
-                        .map(|path| Self::get_internal(&mut data, &self.fetcher, path))
-                        .collect::<FsResult<Vec<VfsEntry>>>()
+                        .map(|path| {
+                            VfsInner::get_internal(
+                                Arc::clone(&self.inner),
+                                &mut data,
+                                &self.inner.fetcher,
+                                path,
+                            )
+                        })
+                        .collect::<FsResult<Vec<VfsEntry<_>>>>()
                 } else {
                     dir.children_enumerated = true;
 
-                    self.fetcher
+                    self.inner
+                        .fetcher
                         .read_children(path)
                         .map_err(|err| FsError::new(err, path.to_path_buf()))?
                         .into_iter()
-                        .map(|path| Self::get_internal(&mut data, &self.fetcher, path))
-                        .collect::<FsResult<Vec<VfsEntry>>>()
+                        .map(|path| {
+                            VfsInner::get_internal(
+                                Arc::clone(&self.inner),
+                                &mut data,
+                                &self.inner.fetcher,
+                                path,
+                            )
+                        })
+                        .collect::<FsResult<Vec<VfsEntry<_>>>>()
                 }
             }
             VfsItem::File(_) => Err(FsError::new(
@@ -136,12 +142,36 @@ impl<F: VfsFetcher> Vfs<F> {
             )),
         }
     }
+}
 
+/// An in-memory filesystem that can be incrementally populated and updated as
+/// filesystem modification events occur.
+///
+/// All operations on the `Vfs` are lazy and do I/O as late as they can to
+/// avoid reading extraneous files or directories from the disk. This means that
+/// they all take `self` mutably, and means that it isn't possible to hold
+/// references to the internal state of the Vfs while traversing it!
+///
+/// Most operations return `VfsEntry` objects to work around this, which is
+/// effectively a index into the `Vfs`.
+struct VfsInner<F> {
+    /// A hierarchical map from paths to items that have been read or partially
+    /// read into memory by the Vfs.
+    data: Mutex<PathMap<VfsItem>>,
+
+    /// This Vfs's fetcher, which is used for all actual interactions with the
+    /// filesystem. It's referred to by the type parameter `F` all over, and is
+    /// generic in order to make it feasible to mock.
+    fetcher: F,
+}
+
+impl<F: VfsFetcher> VfsInner<F> {
     fn get_internal(
+        inner: Arc<Self>,
         data: &mut PathMap<VfsItem>,
         fetcher: &F,
         path: impl AsRef<Path>,
-    ) -> FsResult<VfsEntry> {
+    ) -> FsResult<VfsEntry<F>> {
         let path = path.as_ref();
 
         Self::read_if_not_exists(data, fetcher, path)?;
@@ -154,6 +184,7 @@ impl<F: VfsFetcher> Vfs<F> {
         };
 
         Ok(VfsEntry {
+            vfs: inner,
             path: item.path().to_path_buf(),
             is_file,
         })
@@ -287,6 +318,32 @@ pub trait VfsDebug {
 
 impl<F: VfsFetcher> VfsDebug for Vfs<F> {
     fn debug_load_snapshot<P: AsRef<Path>>(&self, path: P, snapshot: VfsSnapshot) {
+        self.inner.debug_load_snapshot(path, snapshot)
+    }
+
+    fn debug_is_file(&self, path: &Path) -> bool {
+        self.inner.debug_is_file(path)
+    }
+
+    fn debug_contents(&self, path: &Path) -> Option<Arc<Vec<u8>>> {
+        self.inner.debug_contents(path)
+    }
+
+    fn debug_children(&self, path: &Path) -> Option<(bool, Vec<PathBuf>)> {
+        self.inner.debug_children(path)
+    }
+
+    fn debug_orphans(&self) -> Vec<PathBuf> {
+        self.inner.debug_orphans()
+    }
+
+    fn debug_watched_paths(&self) -> Vec<PathBuf> {
+        self.inner.debug_watched_paths()
+    }
+}
+
+impl<F: VfsFetcher> VfsDebug for VfsInner<F> {
+    fn debug_load_snapshot<P: AsRef<Path>>(&self, path: P, snapshot: VfsSnapshot) {
         fn load_snapshot<P: AsRef<Path>>(
             data: &mut PathMap<VfsItem>,
             path: P,
@@ -371,21 +428,22 @@ impl<F: VfsFetcher> VfsDebug for Vfs<F> {
 ///
 /// This struct does not borrow from the Vfs since every operation has the
 /// possibility to mutate the underlying data structure and move memory around.
-pub struct VfsEntry {
+pub struct VfsEntry<F> {
+    vfs: Arc<VfsInner<F>>,
     path: PathBuf,
     is_file: bool,
 }
 
-impl VfsEntry {
+impl<F: VfsFetcher> VfsEntry<F> {
     pub fn path(&self) -> &Path {
         &self.path
     }
 
-    pub fn contents(&self, vfs: &Vfs<impl VfsFetcher>) -> FsResult<Arc<Vec<u8>>> {
+    pub fn contents(&self, vfs: &Vfs<F>) -> FsResult<Arc<Vec<u8>>> {
         vfs.get_contents(&self.path)
     }
 
-    pub fn children(&self, vfs: &Vfs<impl VfsFetcher>) -> FsResult<Vec<VfsEntry>> {
+    pub fn children(&self, vfs: &Vfs<F>) -> FsResult<Vec<VfsEntry<F>>> {
         vfs.get_children(&self.path)
     }
 

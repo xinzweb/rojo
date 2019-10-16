@@ -19,7 +19,7 @@ impl SnapshotMiddleware for SnapshotRbxm {
     fn from_vfs<F: VfsFetcher>(
         _context: &mut InstanceSnapshotContext,
         vfs: &Vfs<F>,
-        entry: &VfsEntry,
+        entry: &VfsEntry<F>,
     ) -> SnapshotInstanceResult<'static> {
         if entry.is_directory() {
             return Ok(None);

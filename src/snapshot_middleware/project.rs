@@ -24,7 +24,7 @@ impl SnapshotMiddleware for SnapshotProject {
     fn from_vfs<F: VfsFetcher>(
         context: &mut InstanceSnapshotContext,
         vfs: &Vfs<F>,
-        entry: &VfsEntry,
+        entry: &VfsEntry<F>,
     ) -> SnapshotInstanceResult<'static> {
         if entry.is_directory() {
             let project_path = entry.path().join("default.project.json");

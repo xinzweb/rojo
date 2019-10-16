@@ -16,7 +16,7 @@ pub trait SnapshotMiddleware {
     fn from_vfs<F: VfsFetcher>(
         context: &mut InstanceSnapshotContext,
         vfs: &Vfs<F>,
-        entry: &VfsEntry,
+        entry: &VfsEntry<F>,
     ) -> SnapshotInstanceResult<'static>;
 
     fn from_instance(_tree: &RbxTree, _id: RbxId) -> SnapshotFileResult {

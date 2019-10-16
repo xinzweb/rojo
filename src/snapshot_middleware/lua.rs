@@ -22,7 +22,7 @@ impl SnapshotMiddleware for SnapshotLua {
     fn from_vfs<F: VfsFetcher>(
         context: &mut InstanceSnapshotContext,
         vfs: &Vfs<F>,
-        entry: &VfsEntry,
+        entry: &VfsEntry<F>,
     ) -> SnapshotInstanceResult<'static> {
         let file_name = entry.path().file_name().unwrap().to_string_lossy();
 
@@ -55,7 +55,7 @@ impl SnapshotMiddleware for SnapshotLua {
 /// Core routine for turning Lua files into snapshots.
 fn snapshot_lua_file<F: VfsFetcher>(
     vfs: &Vfs<F>,
-    entry: &VfsEntry,
+    entry: &VfsEntry<F>,
 ) -> SnapshotInstanceResult<'static> {
     let file_name = entry.path().file_name().unwrap().to_string_lossy();
 
@@ -118,7 +118,7 @@ fn snapshot_lua_file<F: VfsFetcher>(
 fn snapshot_init<F: VfsFetcher>(
     context: &mut InstanceSnapshotContext,
     vfs: &Vfs<F>,
-    folder_entry: &VfsEntry,
+    folder_entry: &VfsEntry<F>,
     init_name: &str,
 ) -> SnapshotInstanceResult<'static> {
     let init_path = folder_entry.path().join(init_name);

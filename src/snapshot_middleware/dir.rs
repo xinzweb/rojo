@@ -21,13 +21,13 @@ impl SnapshotMiddleware for SnapshotDir {
     fn from_vfs<F: VfsFetcher>(
         context: &mut InstanceSnapshotContext,
         vfs: &Vfs<F>,
-        entry: &VfsEntry,
+        entry: &VfsEntry<F>,
     ) -> SnapshotInstanceResult<'static> {
         if entry.is_file() {
             return Ok(None);
         }
 
-        let children: Vec<VfsEntry> = entry.children(vfs)?;
+        let children: Vec<_> = entry.children(vfs)?;
 
         let mut snapshot_children = Vec::new();
 
