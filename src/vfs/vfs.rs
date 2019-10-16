@@ -37,11 +37,11 @@ pub struct Vfs<F> {
 }
 
 impl<F: VfsFetcher> Vfs<F> {
-    pub fn new(fetcher: F) -> Self {
-        Self {
+    pub fn new(fetcher: F) -> Arc<Self> {
+        Arc::new(Self {
             data: Mutex::new(PathMap::new()),
             fetcher,
-        }
+        })
     }
 
     pub fn change_receiver(&self) -> Receiver<VfsEvent> {
