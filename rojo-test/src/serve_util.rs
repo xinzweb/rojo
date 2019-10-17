@@ -1,4 +1,5 @@
 use std::{
+    collections::HashMap,
     fs,
     path::{Path, PathBuf},
     process::Command,
@@ -9,7 +10,7 @@ use rbx_dom_weak::RbxId;
 use serde::Serialize;
 use tempfile::{tempdir, TempDir};
 
-use librojo::web_interface::{ReadResponse, ServerInfoResponse, SubscribeResponse};
+use librojo::web_interface::{Instance, ReadResponse, ServerInfoResponse, SubscribeResponse};
 use rojo_insta_ext::RedactionMap;
 
 use crate::util::{
@@ -34,36 +35,6 @@ pub fn run_serve_test(test_name: &str, callback: impl FnOnce(TestServeSession, R
     redactions.intern(info.root_instance_id);
 
     settings.bind(move || callback(session, redactions));
-}
-
-pub trait Internable<T> {
-    fn intern(&self, redactions: &mut RedactionMap, extra: T);
-}
-
-impl Internable<RbxId> for ReadResponse<'_> {
-    fn intern(&self, redactions: &mut RedactionMap, root_id: RbxId) {
-        redactions.intern(root_id);
-
-        let root_instance = self.instances.get(&root_id).unwrap();
-
-        for &child_id in root_instance.children.iter() {
-            self.intern(redactions, child_id);
-        }
-    }
-}
-
-pub trait InternAndRedact<T> {
-    fn intern_and_redact(&self, redactions: &mut RedactionMap, extra: T) -> serde_yaml::Value;
-}
-
-impl<I, T> InternAndRedact<T> for I
-where
-    I: Serialize + Internable<T>,
-{
-    fn intern_and_redact(&self, redactions: &mut RedactionMap, extra: T) -> serde_yaml::Value {
-        self.intern(redactions, extra);
-        redactions.redacted_yaml(self)
-    }
 }
 
 fn get_port_number() -> usize {

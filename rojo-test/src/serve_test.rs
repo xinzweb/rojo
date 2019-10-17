@@ -2,7 +2,7 @@ use std::fs;
 
 use insta::assert_yaml_snapshot;
 
-use crate::serve_util::{run_serve_test, InternAndRedact};
+use crate::{internable::InternAndRedact, serve_util::run_serve_test};
 
 #[test]
 fn empty() {
@@ -39,7 +39,7 @@ fn scripts() {
         let subscribe_response = session.get_api_subscribe(0).unwrap();
         assert_yaml_snapshot!(
             "scripts_subscribe",
-            redactions.redacted_yaml(subscribe_response)
+            subscribe_response.intern_and_redact(&mut redactions, ())
         );
 
         let read_response = session.get_api_read(root_id).unwrap();
@@ -89,7 +89,7 @@ fn add_folder() {
         let subscribe_response = session.get_api_subscribe(0).unwrap();
         assert_yaml_snapshot!(
             "add_folder_subscribe",
-            redactions.redacted_yaml(subscribe_response)
+            subscribe_response.intern_and_redact(&mut redactions, ())
         );
 
         let read_response = session.get_api_read(root_id).unwrap();
