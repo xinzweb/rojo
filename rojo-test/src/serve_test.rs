@@ -70,9 +70,7 @@ fn just_txt() {
     });
 }
 
-// TODO: Rojo doesn't currently handle files/folders being added.
 #[test]
-#[ignore]
 fn add_folder() {
     run_serve_test("add_folder", |session, mut redactions| {
         let info = session.get_api_rojo().unwrap();
