@@ -1,5 +1,4 @@
 use std::{
-    collections::HashMap,
     fs,
     path::{Path, PathBuf},
     process::Command,
@@ -7,10 +6,10 @@ use std::{
 };
 
 use rbx_dom_weak::RbxId;
-use serde::Serialize;
+
 use tempfile::{tempdir, TempDir};
 
-use librojo::web_interface::{Instance, ReadResponse, ServerInfoResponse, SubscribeResponse};
+use librojo::web_interface::{ReadResponse, ServerInfoResponse, SubscribeResponse};
 use rojo_insta_ext::RedactionMap;
 
 use crate::util::{
