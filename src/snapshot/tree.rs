@@ -44,6 +44,10 @@ impl RojoTree {
         tree
     }
 
+    pub fn into_inner(self) -> RbxTree {
+        self.inner
+    }
+
     pub fn inner(&self) -> &RbxTree {
         &self.inner
     }

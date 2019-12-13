@@ -7,10 +7,6 @@ mod impl_from;
 
 pub mod cli;
 pub mod commands;
-
-// This module is only public for testing right now, and won't be
-// part of the first version of the Rojo API.
-#[doc(hidden)]
 pub mod project;
 
 #[cfg(test)]
@@ -32,3 +28,46 @@ mod web;
 
 pub use crate::session_id::SessionId;
 pub use crate::web::interface as web_interface;
+
+use std::error::Error;
+
+use rbx_dom_weak::{RbxInstanceProperties, RbxTree};
+
+use crate::{
+    project::Project,
+    snapshot::{
+        apply_patch_set, compute_patch_set, InstanceContext, InstancePropertiesWithMeta, RojoTree,
+    },
+    snapshot_middleware::snapshot_project_node,
+    vfs::{RealFetcher, Vfs, WatchMode},
+};
+
+pub fn build_project(project: &Project) -> Result<RbxTree, Box<dyn Error>> {
+    let vfs = Vfs::new(RealFetcher::new(WatchMode::Disabled));
+
+    let mut tree = RojoTree::new(InstancePropertiesWithMeta {
+        properties: RbxInstanceProperties {
+            name: "ROOT".to_owned(),
+            class_name: "Folder".to_owned(),
+            properties: Default::default(),
+        },
+        metadata: Default::default(),
+    });
+
+    let snapshot = snapshot_project_node(
+        &InstanceContext::default(),
+        project.folder_location(),
+        &project.name,
+        &project.tree,
+        &vfs,
+    )
+    .expect("snapshot failed")
+    .expect("snapshot did not return an instance");
+
+    let root_id = tree.get_root_id();
+    let patch_set = compute_patch_set(&snapshot, &tree, root_id);
+
+    apply_patch_set(&mut tree, patch_set);
+
+    Ok(tree.into_inner())
+}
