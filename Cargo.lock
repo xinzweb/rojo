@@ -1087,6 +1087,7 @@ version = "0.1.2"
 dependencies = [
  "crossbeam-channel",
  "fs-err",
+ "log",
  "notify",
  "serde",
 ]

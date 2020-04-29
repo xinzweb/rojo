@@ -97,6 +97,8 @@ impl VfsBackend for StdBackend {
     }
 
     fn watch(&mut self, path: &Path) -> io::Result<()> {
+        return Ok(());
+
         self.watcher
             .watch(path, RecursiveMode::NonRecursive)
             .map_err(|inner| io::Error::new(io::ErrorKind::Other, inner))

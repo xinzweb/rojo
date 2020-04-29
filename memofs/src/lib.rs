@@ -22,6 +22,7 @@ mod noop_backend;
 mod snapshot;
 mod std_backend;
 
+use std::collections::HashMap;
 use std::io;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, MutexGuard};
@@ -111,7 +112,7 @@ impl Iterator for ReadDir {
 /// Vfs equivalent to [`std::fs::Metadata`][std::fs::Metadata].
 ///
 /// [std::fs::Metadata]: https://doc.rust-lang.org/stable/std/fs/struct.Metadata.html
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Metadata {
     pub(crate) is_file: bool,
 }
@@ -139,6 +140,7 @@ pub enum VfsEvent {
 /// Contains implementation details of the Vfs, wrapped by `Vfs` and `VfsLock`,
 /// the public interfaces to this type.
 struct VfsInner {
+    metadata_cache: HashMap<PathBuf, Metadata>,
     backend: Box<dyn VfsBackend>,
 }
 
@@ -177,7 +179,16 @@ impl VfsInner {
 
     fn metadata<P: AsRef<Path>>(&mut self, path: P) -> io::Result<Metadata> {
         let path = path.as_ref();
-        self.backend.metadata(path)
+
+        if let Some(entry) = self.metadata_cache.get(path) {
+            return Ok(entry.clone());
+        }
+
+        let metadata = self.backend.metadata(path)?;
+        self.metadata_cache
+            .insert(path.to_owned(), metadata.clone());
+        Ok(metadata)
+        // self.backend.metadata(path)
     }
 
     fn event_receiver(&self) -> crossbeam_channel::Receiver<VfsEvent> {
@@ -214,6 +225,7 @@ impl Vfs {
     /// Creates a new `Vfs` with the given backend.
     pub fn new<B: VfsBackend>(backend: B) -> Self {
         let lock = VfsInner {
+            metadata_cache: HashMap::new(),
             backend: Box::new(backend),
         };
 
