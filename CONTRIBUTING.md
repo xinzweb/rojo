@@ -8,6 +8,23 @@ Some of the repositories covered are:
 * https://github.com/rojo-rbx/vscode-rojo
 * https://github.com/rojo-rbx/rbxlx-to-rojo
 
+## Prerequisite
+
+- [`cargo`](https://github.com/rust-lang/cargo)
+
+## Build
+
+```
+# retrieve all the sub modules
+git submodule init --recursive --update
+
+# building debug binary ./target/debug/rojo
+cargo build
+
+# building release binary ./target/release/rojo
+cargo build --release
+```
+
 ## Code
 Code contributions are welcome for features and bugs that have been reported in the project's bug tracker. We want to make sure that no one wastes their time, so be sure to talk with maintainers about what changes would be accepted before doing any work!
 
